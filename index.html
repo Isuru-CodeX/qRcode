@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Artistry Ceylon | Social Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      background: linear-gradient(135deg, #f8f4e9 0%, #f1f8e9 100%);
+      color: #3e4c3a;
+      min-height: 100vh;
+      padding: 20px;
+      font-family: 'Montserrat', sans-serif;
+      transition: background 1s ease;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    /* Scroll Progress Bar */
+    #progress-container {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 4px;
+      z-index: 9999;
+      background: #f0f0f0;
+    }
+    #progress-bar {
+      height: 4px;
+      background: linear-gradient(to right, #f9c80e, #b5d99c);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      min-height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 0 20px;
+      animation: fadeIn 1.2s ease-out;
+      position: relative;
+    }
+
+    /* Day/Night Toggle Button */
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 10;
+      transition: all 0.4s ease;
+    }
+    .theme-toggle i {
+      font-size: 1.8rem;
+      color: #f9c80e;
+      transition: transform 0.4s ease, color 0.4s ease;
+    }
+    .theme-toggle:hover i {
+      transform: rotate(30deg) scale(1.1);
+    }
+
+    .logo-container { display: flex; justify-content: center; margin-bottom: 30px; }
+    .logo-image {
+      max-width: 280px; height: auto; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(185, 199, 156, 0.25);
+      animation: floatLogo 6s ease-in-out infinite alternate;
+    }
+
+    /* Hero section */
+    .hero { text-align: center; padding: 20px 0 40px; position: relative; }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem; margin-bottom: 20px; font-weight: 700; letter-spacing: 1px;
+      background: linear-gradient(90deg, #2c5530, #7b9c58, #f9c80e, #7b9c58, #2c5530);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-size: 400% 400%;
+      animation: gradientFlow 8s ease infinite;
+    }
+    .hero p {
+      font-size: 1.15rem; max-width: 650px; margin: 0 auto 40px;
+      color: #5a7054; line-height: 1.6; font-weight: 400;
+      animation: fadeIn 2s ease-in;
+    }
+
+    /* Floating Quote Bubbles */
+    .quote-bubble {
+      position: fixed;
+      opacity: 0;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #2c5530;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      z-index: 1;
+      pointer-events: none;
+      animation: floatQuote 15s linear forwards;
+    }
+
+    /* Social Cards */
+    .social-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px; margin-top: 30px;
+      position: relative;
+      padding-bottom: 60px;
+    }
+    .social-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 16px; padding: 30px 25px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 240px;
+      transition: all 0.4s ease;
+      box-shadow: 0 8px 25px rgba(185, 199, 156, 0.15);
+      border: 1px solid rgba(185, 199, 156, 0.3);
+      position: relative; overflow: hidden; cursor: pointer;
+      transform-origin: center;
+      will-change: transform;
+      transform-style: preserve-3d;
+    }
+
+    /* Ripple Effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(181, 217, 156, 0.3);
+      transform: scale(0);
+      animation: ripple 0.8s linear;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* Shine hover effect */
+    .social-card::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -150%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(120deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.1) 100%);
+      transform: rotate(25deg);
+      transition: all 0.5s ease;
+    }
+    .social-card:hover::after { left: 100%; transition: left 0.8s ease; }
+
+    .icon { font-size: 3.2rem; margin-bottom: 20px; transition: all 0.4s ease; color: #5a7054; }
+    .social-card:hover .icon { transform: scale(1.15) rotate(8deg); color: #2c5530; }
+    .social-name {
+      font-size: 1.5rem; margin-bottom: 12px; font-weight: 600;
+      font-family: 'Playfair Display', serif; color: #2c5530;
+    }
+    .social-desc { font-size: 0.95rem; color: #5a7054; margin-bottom: 20px; text-align: center; line-height: 1.5; }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(to right, #f9c80e, #b5d99c);
+      color: #2c5530; border: none; padding: 12px 28px;
+      border-radius: 50px; font-size: 0.95rem;
+      font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(185, 199, 156, 0.3); text-decoration: none;
+      display: inline-block; letter-spacing: 0.5px;
+      animation: pulse 2.5s infinite;
+      position: relative;
+      z-index: 2;
+    }
+    .btn:hover { transform: translateY(-3px) scale(1.05); }
+
+    /* ===== MOBILE-TOUCH ANIMATIONS ===== */
+    .social-card:active {
+      transform: scale(0.96) translateY(2px);
+      transition: transform 0.15s ease-out;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .social-card:hover {
+        transform: none;
+      }
+      .ripple {
+        animation-duration: 1.2s;
+      }
+    }
+
+    .btn:active {
+      transform: scale(0.95) translateY(2px);
+      box-shadow: 0 2px 8px rgba(185,199,156,0.4);
+    }
+
+    @keyframes springUp {
+      0% { transform: scale(0.96); }
+      70% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .spring-up {
+      animation: springUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Parallax Background Elements */
+    .parallax-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .parallax-item {
+      position: absolute;
+      opacity: 0.1;
+      will-change: transform;
+    }
+    .palm { font-size: 4rem; color: #5a7054; }
+    .island { font-size: 5rem; color: #7b9c58; }
+
+    /* Floating Emojis Container */
+    .floating-emojis-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .emoji {
+      position: absolute;
+      font-size: 2.2rem;
+      opacity: 0.2;
+      animation: drift 30s infinite linear;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px; height: 10px;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Animations — Slightly adjusted for 30fps perception */
+    @keyframes float { 
+      0%,100% { transform: translateY(0) translateX(0) rotate(0); }
+      33% { transform: translateY(-20px) translateX(15px) rotate(5deg); }
+      66% { transform: translateY(10px) translateX(-15px) rotate(-5deg); }
+    }
+    @keyframes fadeIn { from {opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes floatLogo { from {transform: translateY(0);} to {transform: translateY(-12px);} }
+    @keyframes gradientFlow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 rgba(185,199,156,0);} 50%{box-shadow:0 0 18px rgba(185,199,156,0.6);} }
+    @keyframes drift {
+      from { transform: translateY(100vh) rotate(0deg);}
+      to { transform: translateY(-120vh) rotate(360deg);}
+    }
+    @keyframes floatQuote {
+      0% { transform: translateY(100vh) translateX(-50px); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-20vh) translateX(50px); opacity: 0; }
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      color: #5a7054;
+      font-size: 0.9rem;
+      font-weight: 400;
+      position: relative;
+      z-index: 2;
+      margin-top: auto;
+    }
+
+    /* Night Mode */
+    body.night {
+      background: linear-gradient(135deg, #1a2a24 0%, #0d1b15 100%);
+      color: #e0f0d9;
+    }
+    body.night .social-card {
+      background: rgba(30, 50, 40, 0.8);
+      border-color: rgba(100, 150, 120, 0.4);
+    }
+    body.night .hero p,
+    body.night .social-desc,
+    body.night footer {
+      color: #c0d9c0;
+    }
+    body.night .social-name {
+      color: #f9c80e;
+    }
+    body.night .icon {
+      color: #b5d99c;
+    }
+    body.night .btn {
+      background: linear-gradient(to right, #7b9c58, #2c5530);
+      color: #f9c80e;
+    }
+
+    @media (max-width: 768px) {
+      .logo-image { max-width: 240px; }
+      .hero h1 { font-size: 2.2rem; }
+      .social-grid { grid-template-columns: 1fr; gap: 20px; }
+      .social-card { min-height: 220px; padding: 25px 20px; }
+      .icon { font-size: 2.8rem; }
+      .social-name { font-size: 1.4rem; }
+      .hero p { padding: 0 15px; }
+      .theme-toggle { top: 10px; right: 10px; width: 40px; height: 40px; }
+      .theme-toggle i { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Scroll Progress -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-sun"></i>
+  </div>
+
+  <!-- Parallax Background -->
+  <div class="parallax-bg" id="parallaxBg"></div>
+
+  <!-- Floating Emojis Container -->
+  <div class="floating-emojis-container" id="emojiContainer"></div>
+
+  <div class="container">
+    <div>
+      <header>
+        <div class="logo-container">
+          <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,fit=crop,q=95/YD0wD5g57qFopKzX/brand-logo-tac0222-05-1-YanJMaD6awUOX6xR.png"
+               alt="Travel Artistry Ceylon Logo" class="logo-image">
+        </div>
+      </header>
+
+      <section class="hero">
+        <h1>Discover Sri Lanka With Us</h1>
+        <p>Experience the beauty of Ceylon through our curated travel experiences. Connect with us to start your journey.</p>
+
+        <div class="social-grid">
+          <div class="social-card" data-platform="WhatsApp">
+            <i class="fab fa-whatsapp icon"></i>
+            <h3 class="social-name">WhatsApp</h3>
+            <p class="social-desc">Chat with us for personalized travel planning</p>
+            <a href="#" class="btn">Message Us</a>
+          </div>
+
+          <div class="social-card" data-platform="Facebook">
+            <i class="fab fa-facebook-f icon"></i>
+            <h3 class="social-name">Facebook</h3>
+            <p class="social-desc">Follow our journey and see customer experiences</p>
+            <a href="#" class="btn">Follow Us</a>
+          </div>
+
+          <div class="social-card" data-platform="Instagram">
+            <i class="fab fa-instagram icon"></i>
+            <h3 class="social-name">Instagram</h3>
+            <p class="social-desc">See stunning visuals from our travels</p>
+            <a href="#" class="btn">Follow Us</a>
+          </div>
+
+          <div class="social-card" data-platform="LinkedIn">
+            <i class="fab fa-linkedin-in icon"></i>
+            <h3 class="social-name">LinkedIn</h3>
+            <p class="social-desc">Connect with us professionally</p>
+            <a href="#" class="btn">Connect</a>
+          </div>
+
+          <div class="social-card" data-platform="Gmail">
+            <i class="far fa-envelope icon"></i>
+            <h3 class="social-name">Gmail</h3>
+            <p class="social-desc">Send us an email for detailed inquiries</p>
+            <a href="#" class="btn">Send Email</a>
+          </div>
+
+          <div class="social-card" data-platform="Website">
+            <i class="fas fa-globe icon"></i>
+            <h3 class="social-name">Our Website</h3>
+            <p class="social-desc">Explore our travel packages and services</p>
+            <a href="#" class="btn">Visit Now</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer><p>© 2025 Travel Artistry Ceylon. All rights reserved.</p></footer>
+  </div>
+
+  <!-- Audio Element (Hidden) -->
+  <audio id="ambientSound" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_527812cebc.mp3?filename=gentle-waves-119545.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // ============= GLOBAL 30FPS THROTTLER =============
+    const FPS = 30;
+    const frameTime = 1000 / FPS;
+
+    let lastFrameTime = 0;
+    const throttledRAF = (callback) => {
+      return (time) => {
+        if (time - lastFrameTime >= frameTime) {
+          lastFrameTime = time;
+          callback(time);
+        }
+        requestAnimationFrame(throttledRAF(callback));
+      };
+    };
+
+    // Start global throttled loop
+    requestAnimationFrame(throttledRAF(() => {}));
+
+    // Wrap any animation needing 30fps
+    function animateAt30fps(callback) {
+      let lastTime = 0;
+      function loop(timestamp) {
+        if (timestamp - lastTime >= frameTime) {
+          lastTime = timestamp;
+          callback(timestamp);
+        }
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    // ============= SCROLL PROGRESS BAR =============
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById("progress-bar").style.width = scrolled + "%";
+    });
+
+    // ============= THEME TOGGLE (DAY/NIGHT) =============
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const audio = document.getElementById('ambientSound');
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('night');
+      const icon = themeToggle.querySelector('i');
+      if (body.classList.contains('night')) {
+        icon.className = 'fas fa-moon';
+        audio.volume = 0.3;
+        audio.play().catch(e => console.log("Audio play prevented:", e));
+      } else {
+        icon.className = 'fas fa-sun';
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    });
+
+    // ============= PARALLAX BACKGROUND ELEMENTS =============
+    const parallaxBg = document.getElementById('parallaxBg');
+    const palms = ['🌴','🌴','🌿','🌴'];
+    const islands = ['🏝️','⛰️','🏖️'];
+
+    for (let i = 0; i < 5; i++) {
+      const palm = document.createElement('div');
+      palm.className = 'parallax-item palm';
+      palm.textContent = palms[Math.floor(Math.random() * palms.length)];
+      palm.style.left = `${10 + i * 18}%`;
+      palm.style.top = `${30 + Math.random() * 40}%`;
+      palm.style.transform = `scale(${0.8 + Math.random() * 0.6})`;
+      parallaxBg.appendChild(palm);
+    }
+
+    for (let i = 0; i < 3; i++) {
+      const island = document.createElement('div');
+      island.className = 'parallax-item island';
+      island.textContent = islands[Math.floor(Math.random() * islands.length)];
+      island.style.left = `${20 + i * 30}%`;
+      island.style.bottom = `${10 + Math.random() * 20}%`;
+      island.style.transform = `scale(${0.7 + Math.random() * 0.5})`;
+      parallaxBg.appendChild(island);
+    }
+
+    // Throttled parallax at 30fps
+    window.addEventListener('scroll', throttle(() => {
+      const scrolled = window.pageYOffset;
+      document.querySelectorAll('.parallax-item').forEach(item => {
+        const speed = item.classList.contains('palm') ? 0.3 : 0.15;
+        item.style.transform = `translateY(${scrolled * speed}px) scale(${item.classList.contains('palm') ? 0.8 + Math.random() * 0.6 : 0.7 + Math.random() * 0.5})`;
+      });
+    }, frameTime));
+
+    // Simple throttle utility
+    function throttle(func, limit) {
+      let inThrottle;
+      return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+          func.apply(context, args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      }
+    }
+
+    // ============= FLOATING QUOTE BUBBLES =============
+    const quotes = [
+      "“The journey not the arrival matters.” — T.S. Eliot",
+      "“Not all those who wander are lost.” — J.R.R. Tolkien",
+      "“Travel far enough, you meet yourself.” — David Mitchell",
+      "“Take only memories, leave only footprints.” — Chief Seattle",
+      "“Adventure is worthwhile.” — Aesop",
+      "“Live with no excuses, travel with no regrets.”"
+    ];
+
+    function createQuoteBubble() {
+      const bubble = document.createElement('div');
+      bubble.className = 'quote-bubble';
+      bubble.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+      bubble.style.left = `${Math.random() * 80 + 10}%`;
+      document.body.appendChild(bubble);
+
+      setTimeout(() => {
+        bubble.remove();
+      }, 15000);
+    }
+
+    createQuoteBubble();
+    setInterval(createQuoteBubble, 8000);
+
+    // ============= CONFETTI EFFECT @ 30FPS =============
+    function createConfetti(x, y) {
+      const colors = ['#f9c80e', '#b5d99c', '#2c5530', '#f1f8e9', '#7b9c58'];
+      for (let i = 0; i < 25; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${x}px`;
+        confetti.style.top = `${y}px`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(confetti);
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 5 + 3;
+
+        let posX = x;
+        let posY = y;
+        let gravity = 0.1;
+        let velocityY = -velocity * 0.5;
+
+        // Update physics at 30fps
+        animateAt30fps(() => {
+          velocityY += gravity;
+          posX += Math.cos(angle) * velocity;
+          posY += velocityY;
+
+          confetti.style.top = `${posY}px`;
+          confetti.style.left = `${posX}px`;
+          confetti.style.opacity = parseFloat(confetti.style.opacity || 1) - 0.01;
+
+          if (confetti.style.opacity <= 0) {
+            confetti.remove();
+            return false; // stop animating
+          }
+          return true; // continue
+        });
+      }
+    }
+
+    // ============= ENHANCED TOUCH-FRIENDLY CARD INTERACTIONS =============
+    document.querySelectorAll('.social-card').forEach(card => {
+      let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+      const handleInteractionStart = function(e) {
+        this.style.transform = 'scale(0.97)';
+
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        const rect = this.getBoundingClientRect();
+
+        const size = isTouchDevice ? 
+          Math.max(rect.width, rect.height) * 1.5 : 
+          Math.max(rect.width, rect.height);
+
+        ripple.style.width = ripple.style.height = `${size}px`;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        ripple.style.left = `${clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${clientY - rect.top - size / 2}px`;
+        this.appendChild(ripple);
+
+        setTimeout(() => { ripple.remove(); }, isTouchDevice ? 1200 : 800);
+      };
+
+      const handleInteractionEnd = function(e) {
+        this.style.transform = '';
+        this.classList.add('spring-up');
+        setTimeout(() => { this.classList.remove('spring-up'); }, 400);
+
+        const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+        const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+        // Optional haptic feedback
+        if ('vibrate' in navigator) {
+          navigator.vibrate(20);
+        }
+
+        createConfetti(clientX, clientY);
+
+        const platform = this.getAttribute('data-platform');
+        setTimeout(() => {
+          switch(platform) {
+            case 'WhatsApp': openWhatsApp(); break;
+            case 'Facebook': openFacebook(); break;
+            case 'Instagram': openInstagram(); break;
+            case 'LinkedIn': openLinkedIn(); break;
+            case 'Gmail': openGmail(); break;
+            case 'Website': openWebsite(); break;
+          }
+        }, 300);
+      };
+
+      card.addEventListener('mousedown', handleInteractionStart);
+      card.addEventListener('touchstart', handleInteractionStart, { passive: true });
+
+      card.addEventListener('mouseup', handleInteractionEnd);
+      card.addEventListener('touchend', handleInteractionEnd, { passive: true });
+    });
+
+    // ============= SOCIAL MEDIA FUNCTIONS =============
+    function openWhatsApp() { window.open('https://wa.me/94771590837', '_blank'); }
+    function openFacebook() { window.open('https://www.facebook.com/travelartistryceylon/', '_blank'); }
+    function openInstagram() { window.open('https://instagram.com/travelartistryceylon', '_blank'); }
+    function openLinkedIn() { window.open('https://www.linkedin.com/in/travel-artistry-ceylon-bb5339369/', '_blank'); }
+    function openGmail() { window.location.href = 'mailto:chathumal@travelartistryceylon.lk'; }
+    function openWebsite() { window.open('https://travelartistryceylon.com/', '_blank'); }
+
+    // ============= FLOATING EMOJIS =============
+    const emojiContainer = document.getElementById('emojiContainer');
+    const emojis = ["✈️","🌺","🌊","🐘","🌅","🛶","🍃","🪷"];
+    
+    for (let i = 0; i < 10; i++) {
+      const em = document.createElement("div");
+      em.classList.add("emoji");
+      em.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      em.style.left = Math.random() * 100 + "%";
+      em.style.top = Math.random() * 100 + "%";
+      em.style.animationDuration = (15 + Math.random() * 20) + "s";
+      em.style.fontSize = (1.5 + Math.random() * 1.5) + "rem";
+      emojiContainer.appendChild(em);
+    }
+  </script>
+</body>
+</html>
